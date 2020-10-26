@@ -1,0 +1,17 @@
+name: "mio"
+description:
+    "Lightweight non-blocking IO"
+
+third_party {
+  url {
+    type: HOMEPAGE
+    value: "https://crates.io/crates/mio"
+  }
+  url {
+    type: ARCHIVE
+    value: "https://static.crates.io/crates/mio/mio-0.7.3.crate"
+  }
+  version: "0.7.3"
+  last_upgrade_date { year: 2020 month: 10 day: 16 }
+  license_type: NOTICE
+}
