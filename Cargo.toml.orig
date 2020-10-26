@@ -1,0 +1,66 @@
+[package]
+edition = "2018"
+name = "mio"
+# When releasing to crates.io:
+# - Update html_root_url.
+# - Update CHANGELOG.md.
+# - Update doc URL.
+# - Create git tag
+version       = "0.7.3"
+license       = "MIT"
+authors       = ["Carl Lerche <me@carllerche.com>"]
+description   = "Lightweight non-blocking IO"
+documentation = "https://docs.rs/mio/0.7.3"
+homepage      = "https://github.com/tokio-rs/mio"
+repository    = "https://github.com/tokio-rs/mio"
+readme        = "README.md"
+keywords      = ["io", "async", "non-blocking"]
+categories    = ["asynchronous"]
+include       = [
+  "Cargo.toml",
+  "LICENSE",
+  "README.md",
+  "CHANGELOG.md",
+  "src/**/*.rs",
+  "examples/**/*.rs",
+]
+
+[features]
+default = []
+os-poll = []
+os-util = []
+tcp = []
+udp = []
+uds = []
+extra-docs = []
+
+[dependencies]
+log = "0.4.8"
+
+[target.'cfg(unix)'.dependencies]
+libc = "0.2.69"
+
+[target.'cfg(windows)'.dependencies]
+miow   = "0.3.3"
+winapi = { version = "0.3", features = ["winsock2", "mswsock"] }
+ntapi  = "0.3"
+
+[dev-dependencies]
+env_logger = { version = "0.6.2", default-features = false }
+net2       = "0.2.33"
+rand = "0.4"
+
+[package.metadata.docs.rs]
+all-features = true
+rustdoc-args = ["--cfg", "docsrs"]
+
+[package.metadata.playground]
+features = ["os-poll", "os-util", "tcp", "udp", "uds"]
+
+[[example]]
+name = "tcp_server"
+required-features = ["os-poll", "tcp"]
+
+[[example]]
+name = "udp_server"
+required-features = ["os-poll", "udp"]
