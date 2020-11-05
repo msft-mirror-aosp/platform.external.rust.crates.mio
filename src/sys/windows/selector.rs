@@ -12,6 +12,7 @@ cfg_net! {
 
 use miow::iocp::{CompletionPort, CompletionStatus};
 use std::collections::VecDeque;
+use std::io;
 use std::marker::PhantomPinned;
 use std::os::windows::io::RawSocket;
 use std::pin::Pin;
@@ -20,7 +21,6 @@ use std::sync::atomic::AtomicUsize;
 use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::{Arc, Mutex};
 use std::time::Duration;
-use std::io;
 use winapi::shared::ntdef::NT_SUCCESS;
 use winapi::shared::ntdef::{HANDLE, PVOID};
 use winapi::shared::ntstatus::STATUS_CANCELLED;
@@ -47,7 +47,7 @@ impl AfdGroup {
     }
 }
 
-cfg_net! {
+cfg_io_source! {
     const POLL_GROUP__MAX_GROUP_SIZE: usize = 32;
 
     impl AfdGroup {
@@ -256,7 +256,7 @@ impl SockState {
     }
 }
 
-cfg_net! {
+cfg_io_source! {
     impl SockState {
         fn new(raw_socket: RawSocket, afd: Arc<Afd>) -> io::Result<SockState> {
             Ok(SockState {
@@ -327,8 +327,9 @@ static NEXT_ID: AtomicUsize = AtomicUsize::new(0);
 pub struct Selector {
     #[cfg(debug_assertions)]
     id: usize,
-
     pub(super) inner: Arc<SelectorInner>,
+    #[cfg(debug_assertions)]
+    has_waker: AtomicBool,
 }
 
 impl Selector {
@@ -340,6 +341,8 @@ impl Selector {
                 #[cfg(debug_assertions)]
                 id,
                 inner: Arc::new(inner),
+                #[cfg(debug_assertions)]
+                has_waker: AtomicBool::new(false),
             }
         })
     }
@@ -349,6 +352,8 @@ impl Selector {
             #[cfg(debug_assertions)]
             id: self.id,
             inner: Arc::clone(&self.inner),
+            #[cfg(debug_assertions)]
+            has_waker: AtomicBool::new(self.has_waker.load(Ordering::Acquire)),
         })
     }
 
@@ -358,6 +363,11 @@ impl Selector {
     /// can poll IOCP at a time.
     pub fn select(&mut self, events: &mut Events, timeout: Option<Duration>) -> io::Result<()> {
         self.inner.select(events, timeout)
+    }
+
+    #[cfg(debug_assertions)]
+    pub fn register_waker(&self) -> bool {
+        self.has_waker.swap(true, Ordering::AcqRel)
     }
 
     pub(super) fn clone_port(&self) -> Arc<CompletionPort> {
@@ -370,7 +380,7 @@ impl Selector {
     }
 }
 
-cfg_net! {
+cfg_io_source! {
     use super::InternalState;
     use crate::Token;
 
@@ -499,7 +509,7 @@ impl SelectorInner {
             } else if iocp_event.token() % 2 == 1 {
                 // Handle is a named pipe. This could be extended to be any non-AFD event.
                 let callback = (*(iocp_event.overlapped() as *mut super::Overlapped)).callback;
-    
+
                 let len = events.len();
                 callback(iocp_event.entry(), Some(events));
                 n += events.len() - len;
@@ -525,7 +535,7 @@ impl SelectorInner {
     }
 }
 
-cfg_net! {
+cfg_io_source! {
     use std::mem::size_of;
     use std::ptr::null_mut;
     use winapi::um::mswsock;
@@ -701,7 +711,7 @@ impl Drop for SelectorInner {
                             let callback = unsafe {
                                 (*(iocp_event.overlapped() as *mut super::Overlapped)).callback
                             };
-                
+
                             callback(iocp_event.entry(), None);
                         } else {
                             // drain sock state to release memory of Arc reference
