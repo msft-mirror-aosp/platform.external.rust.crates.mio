@@ -4,7 +4,7 @@ use std::mem::MaybeUninit;
 use std::ops::{Deref, DerefMut};
 use std::os::unix::io::{AsRawFd, RawFd};
 #[cfg(debug_assertions)]
-use std::sync::atomic::{AtomicUsize, Ordering};
+use std::sync::atomic::{AtomicBool, AtomicUsize, Ordering};
 use std::time::Duration;
 use std::{cmp, io, ptr, slice};
 
@@ -69,6 +69,8 @@ pub struct Selector {
     #[cfg(debug_assertions)]
     id: usize,
     kq: RawFd,
+    #[cfg(debug_assertions)]
+    has_waker: AtomicBool,
 }
 
 impl Selector {
@@ -79,6 +81,8 @@ impl Selector {
                 #[cfg(debug_assertions)]
                 id: NEXT_ID.fetch_add(1, Ordering::Relaxed),
                 kq,
+                #[cfg(debug_assertions)]
+                has_waker: AtomicBool::new(false),
             })
     }
 
@@ -88,6 +92,8 @@ impl Selector {
             #[cfg(debug_assertions)]
             id: self.id,
             kq,
+            #[cfg(debug_assertions)]
+            has_waker: AtomicBool::new(self.has_waker.load(Ordering::Acquire)),
         })
     }
 
@@ -208,6 +214,11 @@ impl Selector {
         kevent_register(self.kq, &mut changes, &[libc::ENOENT as Data])
     }
 
+    #[cfg(debug_assertions)]
+    pub fn register_waker(&self) -> bool {
+        self.has_waker.swap(true, Ordering::AcqRel)
+    }
+
     // Used by `Waker`.
     #[cfg(any(target_os = "freebsd", target_os = "ios", target_os = "macos"))]
     pub fn setup_waker(&self, token: Token) -> io::Result<()> {
@@ -292,7 +303,7 @@ fn check_errors(events: &[libc::kevent], ignored_errors: &[Data]) -> io::Result<
     Ok(())
 }
 
-cfg_net! {
+cfg_io_source! {
     #[cfg(debug_assertions)]
     impl Selector {
         pub fn id(&self) -> usize {
