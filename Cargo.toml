@@ -13,12 +13,12 @@
 [package]
 edition = "2018"
 name = "mio"
-version = "0.7.4"
+version = "0.7.5"
 authors = ["Carl Lerche <me@carllerche.com>"]
 include = ["Cargo.toml", "LICENSE", "README.md", "CHANGELOG.md", "src/**/*.rs", "examples/**/*.rs"]
 description = "Lightweight non-blocking IO"
 homepage = "https://github.com/tokio-rs/mio"
-documentation = "https://docs.rs/mio/0.7.4"
+documentation = "https://docs.rs/mio/0.7.5"
 readme = "README.md"
 keywords = ["io", "async", "non-blocking"]
 categories = ["asynchronous"]
@@ -47,14 +47,12 @@ default-features = false
 [dev-dependencies.rand]
 version = "0.4"
 
-[dev-dependencies.socket2]
-version = "0.3.15"
-
 [features]
 default = []
 extra-docs = []
 os-poll = []
 os-util = []
+pipe = ["os-poll"]
 tcp = []
 udp = []
 uds = []
