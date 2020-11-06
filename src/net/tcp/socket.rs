@@ -82,9 +82,35 @@ impl TcpSocket {
         sys::tcp::set_reuseaddr(self.sys, reuseaddr)
     }
 
+    /// Get the value of `SO_REUSEADDR` set on this socket.
+    pub fn get_reuseaddr(&self) -> io::Result<bool> {
+        sys::tcp::get_reuseaddr(self.sys)
+    }
+
+    /// Sets the value of `SO_REUSEPORT` on this socket.
+    /// Only supported available in unix
+    #[cfg(all(unix, not(any(target_os = "solaris", target_os = "illumos"))))]
+    pub fn set_reuseport(&self, reuseport: bool) -> io::Result<()> {
+        sys::tcp::set_reuseport(self.sys, reuseport)
+    }
+
+    /// Get the value of `SO_REUSEPORT` set on this socket.
+    /// Only supported available in unix
+    #[cfg(all(unix, not(any(target_os = "solaris", target_os = "illumos"))))]
+    pub fn get_reuseport(&self) -> io::Result<bool> {
+        sys::tcp::get_reuseport(self.sys)
+    }
+
     /// Sets the value of `SO_LINGER` on this socket.
     pub fn set_linger(&self, dur: Option<Duration>) -> io::Result<()> {
         sys::tcp::set_linger(self.sys, dur)
+    }
+
+    /// Returns the local address of this socket
+    ///
+    /// Will return `Err` result in windows if called before calling `bind`
+    pub fn get_localaddr(&self) -> io::Result<SocketAddr> {
+        sys::tcp::get_localaddr(self.sys)
     }
 }
 
