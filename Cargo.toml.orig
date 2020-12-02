@@ -6,11 +6,11 @@ name = "mio"
 # - Update CHANGELOG.md.
 # - Update doc URL.
 # - Create git tag
-version       = "0.7.5"
+version       = "0.7.6"
 license       = "MIT"
 authors       = ["Carl Lerche <me@carllerche.com>"]
 description   = "Lightweight non-blocking IO"
-documentation = "https://docs.rs/mio/0.7.5"
+documentation = "https://docs.rs/mio/0.7.6"
 homepage      = "https://github.com/tokio-rs/mio"
 repository    = "https://github.com/tokio-rs/mio"
 readme        = "README.md"
@@ -25,15 +25,25 @@ include       = [
   "examples/**/*.rs",
 ]
 
+# For documentation of features see the `mio::features` module.
 [features]
+# By default Mio only provides a shell implementation.
 default = []
+
+# Enables the `Poll` and `Registry` types.
 os-poll = []
-os-util = []
-pipe = ["os-poll"]
-tcp = []
-udp = []
-uds = []
-extra-docs = []
+# Enables additional OS specific extensions, e.g. Unix `pipe(2)`.
+os-ext = ["os-poll"]
+# Enables `mio::net` module containing networking primitives.
+net = []
+
+# Deprecated features, will be removed in a future version.
+extra-docs = [] # Docs are now always present.
+tcp = ["net"] # Replaced with "net" feature.
+udp = ["net"] # Replaced with "net" feature.
+uds = ["net"] # Replaced with "net" feature.
+pipe = ["os-ext"] # Replaced with "os-ext" feature.
+os-util = ["os-ext"]# Replaced with "os-ext" feature.
 
 [dependencies]
 log = "0.4.8"
@@ -42,7 +52,7 @@ log = "0.4.8"
 libc = "0.2.69"
 
 [target.'cfg(windows)'.dependencies]
-miow   = "0.3.3"
+miow   = "0.3.6"
 winapi = { version = "0.3", features = ["winsock2", "mswsock"] }
 ntapi  = "0.3"
 
@@ -55,12 +65,12 @@ all-features = true
 rustdoc-args = ["--cfg", "docsrs"]
 
 [package.metadata.playground]
-features = ["os-poll", "os-util", "tcp", "udp", "uds"]
+features = ["os-poll", "os-ext", "net"]
 
 [[example]]
 name = "tcp_server"
-required-features = ["os-poll", "tcp"]
+required-features = ["os-poll", "net"]
 
 [[example]]
 name = "udp_server"
-required-features = ["os-poll", "udp"]
+required-features = ["os-poll", "net"]
