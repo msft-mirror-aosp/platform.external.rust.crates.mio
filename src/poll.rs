@@ -361,7 +361,7 @@ cfg_os_poll! {
 #[cfg(unix)]
 impl AsRawFd for Poll {
     fn as_raw_fd(&self) -> RawFd {
-        self.registry.selector.as_raw_fd()
+        self.registry.as_raw_fd()
     }
 }
 
@@ -528,7 +528,7 @@ impl Registry {
     /// // the token is the same it must be specified.
     /// poll.registry().reregister(
     ///     &mut socket,
-    ///     Token(2),
+    ///     Token(0),
     ///     Interest::WRITABLE)?;
     /// #     Ok(())
     /// # }
@@ -633,6 +633,13 @@ impl Registry {
 impl fmt::Debug for Registry {
     fn fmt(&self, fmt: &mut fmt::Formatter<'_>) -> fmt::Result {
         fmt.debug_struct("Registry").finish()
+    }
+}
+
+#[cfg(unix)]
+impl AsRawFd for Registry {
+    fn as_raw_fd(&self) -> RawFd {
+        self.selector.as_raw_fd()
     }
 }
 
