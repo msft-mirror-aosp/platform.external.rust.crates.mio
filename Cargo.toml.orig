@@ -6,11 +6,15 @@ name = "mio"
 # - Update CHANGELOG.md.
 # - Update doc URL.
 # - Create git tag
-version       = "0.7.6"
+version       = "0.7.7"
 license       = "MIT"
-authors       = ["Carl Lerche <me@carllerche.com>"]
+authors       = [
+  "Carl Lerche <me@carllerche.com>",
+  "Thomas de Zeeuw <thomasdezeeuw@gmail.com>",
+  "Tokio Contributors <team@tokio.rs>",
+]
 description   = "Lightweight non-blocking IO"
-documentation = "https://docs.rs/mio/0.7.6"
+documentation = "https://docs.rs/mio/0.7.7"
 homepage      = "https://github.com/tokio-rs/mio"
 repository    = "https://github.com/tokio-rs/mio"
 readme        = "README.md"
@@ -63,6 +67,19 @@ rand = "0.4"
 [package.metadata.docs.rs]
 all-features = true
 rustdoc-args = ["--cfg", "docsrs"]
+targets = [
+  "aarch64-apple-ios",
+  "aarch64-linux-android",
+  "x86_64-apple-darwin",
+  "x86_64-pc-windows-msvc",
+  "x86_64-sun-solaris",
+  "x86_64-unknown-dragonfly",
+  "x86_64-unknown-freebsd",
+  "x86_64-unknown-linux-gnu",
+  "x86_64-unknown-netbsd",
+  "x86_64-unknown-openbsd",
+]
+
 
 [package.metadata.playground]
 features = ["os-poll", "os-ext", "net"]
