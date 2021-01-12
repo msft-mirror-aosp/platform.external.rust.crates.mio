@@ -154,6 +154,7 @@ pub fn new() -> io::Result<(Sender, Receiver)> {
         target_os = "linux",
         target_os = "netbsd",
         target_os = "openbsd",
+        target_os = "illumos",
     ))]
     unsafe {
         if libc::pipe2(fds.as_mut_ptr(), libc::O_CLOEXEC | libc::O_NONBLOCK) != 0 {
@@ -192,6 +193,7 @@ pub fn new() -> io::Result<(Sender, Receiver)> {
         target_os = "ios",
         target_os = "macos",
         target_os = "solaris",
+        target_os = "illumos",
     )))]
     compile_error!("unsupported target for `mio::unix::pipe`");
 
@@ -241,6 +243,20 @@ impl event::Source for Sender {
 }
 
 impl Write for Sender {
+    fn write(&mut self, buf: &[u8]) -> io::Result<usize> {
+        self.inner.do_io(|sender| (&*sender).write(buf))
+    }
+
+    fn write_vectored(&mut self, bufs: &[IoSlice<'_>]) -> io::Result<usize> {
+        self.inner.do_io(|sender| (&*sender).write_vectored(bufs))
+    }
+
+    fn flush(&mut self) -> io::Result<()> {
+        self.inner.do_io(|sender| (&*sender).flush())
+    }
+}
+
+impl Write for &Sender {
     fn write(&mut self, buf: &[u8]) -> io::Result<usize> {
         self.inner.do_io(|sender| (&*sender).write(buf))
     }
@@ -333,6 +349,16 @@ impl Read for Receiver {
     }
 }
 
+impl Read for &Receiver {
+    fn read(&mut self, buf: &mut [u8]) -> io::Result<usize> {
+        self.inner.do_io(|sender| (&*sender).read(buf))
+    }
+
+    fn read_vectored(&mut self, bufs: &mut [IoSliceMut<'_>]) -> io::Result<usize> {
+        self.inner.do_io(|sender| (&*sender).read_vectored(bufs))
+    }
+}
+
 /// # Notes
 ///
 /// The underlying pipe is **not** set to non-blocking.
@@ -373,6 +399,7 @@ impl IntoRawFd for Receiver {
     }
 }
 
+#[cfg(not(target_os = "illumos"))]
 fn set_nonblocking(fd: RawFd, nonblocking: bool) -> io::Result<()> {
     let value = nonblocking as libc::c_int;
     if unsafe { libc::ioctl(fd, libc::FIONBIO, &value) } == -1 {
@@ -380,4 +407,26 @@ fn set_nonblocking(fd: RawFd, nonblocking: bool) -> io::Result<()> {
     } else {
         Ok(())
     }
+}
+
+#[cfg(target_os = "illumos")]
+fn set_nonblocking(fd: RawFd, nonblocking: bool) -> io::Result<()> {
+    let flags = unsafe { libc::fcntl(fd, libc::F_GETFL) };
+    if flags < 0 {
+        return Err(io::Error::last_os_error());
+    }
+
+    let nflags = if nonblocking {
+        flags | libc::O_NONBLOCK
+    } else {
+        flags & !libc::O_NONBLOCK
+    };
+
+    if flags != nflags {
+        if unsafe { libc::fcntl(fd, libc::F_SETFL, nflags) } < 0 {
+            return Err(io::Error::last_os_error());
+        }
+    }
+
+    Ok(())
 }

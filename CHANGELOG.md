@@ -1,3 +1,33 @@
+# 0.7.7
+
+## Added
+
+* `UdpSocket::only_v6`
+  (https://github.com/tokio-rs/mio/commit/0101e05a800f17fb88f4315d9b9fe0f08cca6e57).
+* `Clone` implementation for `Event`
+  (https://github.com/tokio-rs/mio/commit/26540ebbae89df6d4d08465c56f715d8f2addfc3).
+* `AsRawFd` implementation for `Registry`
+  (https://github.com/tokio-rs/mio/commit/f70daa72da0042b1880256164774c3286d315a02).
+* `Read` and `Write` implementation for `&unix::pipe::Sender` and `Receiver`,
+  that is on the reference to them, an implementation existed on the types
+  themselves already
+  (https://github.com/tokio-rs/mio/commit/1be481dcbbcb6906364008b5d61e7f53cddc3eb3).
+
+
+## Fixes
+
+* Underflow in `SocketAddr::address`
+  (https://github.com/tokio-rs/mio/commit/6d3fa69240cd4bb95e9d34605c660c30245a18bd).
+* Android build with the net feature enabled, but with os-poll disabled
+  (https://github.com/tokio-rs/mio/commit/49d8fd33e026ad6e2c055d05d6667180ba2af7be).
+* Solaris build with the net feature enabled, but with os-poll disabled
+  (https://github.com/tokio-rs/mio/commit/a6e025e9d9511639ec106ebedc0dd312bdc9be12).
+* Ensure that `Waker::wake` works on illumos systems with poor `pipe(2)` and
+  `epoll(2)` interaction using `EPOLLET`
+  (https://github.com/tokio-rs/mio/commit/943d4249dcc17cd8b4d2250c4fa19116097248fa).
+* Fix `unix::pipe` on illumos
+  (https://github.com/tokio-rs/mio/commit/0db49f6d5caf54b12176821363d154384357e70a).
+
 # 0.7.6
 
 ## Added
@@ -181,6 +211,36 @@ information.
   creating and using sockets, e.g. making use of `accept4(2)`.
 * The `fmt::Debug` implementation of `Events` is now actually useful as it
   prints all `Event`s.
+
+# 0.6.23 (Dec 01, 2020)
+
+### Changed
+- **MSRV**: Increased the MSRV from 1.18.0 (Jun 8, 2017) to 1.31.0 (Dec 6,
+  2018)
+  (https://github.com/tokio-rs/mio/commit/4879e0d32ddfd98e762fc87240e594a3ad8fca30).
+
+### Fixed
+- Work around Linux kernel < 2.6.37 bug on 32-bits making timeouts longer then
+  ~30 minutes effectively infinite
+  (https://github.com/tokio-rs/mio/commit/e7cba59950e9c9fa6194e29b5b1e72029e3df455).
+- Update miow and net2 depedencies to get rid of invalid memory layout assumption
+  (https://github.com/tokio-rs/mio/commit/13f02ac0a86d7c0c0001e5ff8960a0b4340d075c).
+
+# 0.6.22 (May 01, 2020)
+
+### Added
+- Add support for illumos target (#1294)
+
+# 0.6.21 (November 27, 2019)
+
+### Fixed
+- remove `=` dependency on `cfg-if`.
+
+# 0.6.20 (November 21, 2019)
+
+### Fixed
+- Use default IOCP concurrency value (#1161).
+- setting FD_CLOEXEC in pipe (#1095).
 
 # 0.6.19 (May 28, 2018)
 
