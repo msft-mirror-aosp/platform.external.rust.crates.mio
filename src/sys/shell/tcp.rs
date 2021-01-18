@@ -1,7 +1,7 @@
+use crate::net::TcpKeepalive;
 use std::io;
 use std::net::{self, SocketAddr};
 use std::time::Duration;
-use crate::net::TcpKeepalive;
 
 pub(crate) type TcpSocket = i32;
 
@@ -79,24 +79,18 @@ pub(crate) fn get_keepalive(_: TcpSocket) -> io::Result<bool> {
     os_required!();
 }
 
-#[cfg(any(
-    target_os = "linux",
-    target_os = "macos",
-    target_os = "ios",
-    target_os = "freebsd",
-    target_os = "netbsd",
-    target_os = "windows",
-))]
 pub(crate) fn set_keepalive_params(_: TcpSocket, _: TcpKeepalive) -> io::Result<()> {
     os_required!()
 }
 
 #[cfg(any(
+    target_os = "android",
     target_os = "linux",
     target_os = "macos",
     target_os = "ios",
     target_os = "freebsd",
     target_os = "netbsd",
+    target_os = "solaris",
 ))]
 pub(crate) fn get_keepalive_time(_: TcpSocket) -> io::Result<Option<Duration>> {
     os_required!()
