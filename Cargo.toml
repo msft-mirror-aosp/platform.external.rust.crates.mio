@@ -13,12 +13,12 @@
 [package]
 edition = "2018"
 name = "mio"
-version = "0.7.6"
-authors = ["Carl Lerche <me@carllerche.com>"]
+version = "0.7.7"
+authors = ["Carl Lerche <me@carllerche.com>", "Thomas de Zeeuw <thomasdezeeuw@gmail.com>", "Tokio Contributors <team@tokio.rs>"]
 include = ["Cargo.toml", "LICENSE", "README.md", "CHANGELOG.md", "src/**/*.rs", "examples/**/*.rs"]
 description = "Lightweight non-blocking IO"
 homepage = "https://github.com/tokio-rs/mio"
-documentation = "https://docs.rs/mio/0.7.6"
+documentation = "https://docs.rs/mio/0.7.7"
 readme = "README.md"
 keywords = ["io", "async", "non-blocking"]
 categories = ["asynchronous"]
@@ -27,6 +27,7 @@ repository = "https://github.com/tokio-rs/mio"
 [package.metadata.docs.rs]
 all-features = true
 rustdoc-args = ["--cfg", "docsrs"]
+targets = ["aarch64-apple-ios", "aarch64-linux-android", "x86_64-apple-darwin", "x86_64-pc-windows-msvc", "x86_64-sun-solaris", "x86_64-unknown-dragonfly", "x86_64-unknown-freebsd", "x86_64-unknown-linux-gnu", "x86_64-unknown-netbsd", "x86_64-unknown-openbsd"]
 
 [package.metadata.playground]
 features = ["os-poll", "os-ext", "net"]
