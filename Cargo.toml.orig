@@ -6,7 +6,7 @@ name = "mio"
 # - Update CHANGELOG.md.
 # - Update doc URL.
 # - Create git tag
-version       = "0.7.8"
+version       = "0.7.11"
 license       = "MIT"
 authors       = [
   "Carl Lerche <me@carllerche.com>",
@@ -57,7 +57,7 @@ libc = "0.2.86"
 
 [target.'cfg(windows)'.dependencies]
 miow   = "0.3.6"
-winapi = { version = "0.3", features = ["winsock2", "mswsock"] }
+winapi = { version = "0.3", features = ["winsock2", "mswsock", "mstcpip"] }
 ntapi  = "0.3"
 
 [dev-dependencies]
