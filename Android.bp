@@ -46,5 +46,5 @@ rust_library {
 
 // dependent_library ["feature_list"]
 //   cfg-if-1.0.0
-//   libc-0.2.94 "default,std"
+//   libc-0.2.97 "default,std"
 //   log-0.4.14 "std"
