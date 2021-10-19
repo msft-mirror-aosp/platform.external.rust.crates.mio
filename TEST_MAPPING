@@ -8,6 +8,9 @@
       "name": "futures-util_device_test_src_lib"
     },
     {
+      "name": "mio_device_test_src_lib"
+    },
+    {
       "name": "quiche_device_test_src_lib"
     },
     {
