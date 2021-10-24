@@ -22,6 +22,8 @@ rust_library {
     name: "libmio",
     host_supported: true,
     crate_name: "mio",
+    cargo_env_compat: true,
+    cargo_pkg_version: "0.7.13",
     srcs: ["src/lib.rs"],
     edition: "2018",
     features: [
@@ -44,7 +46,41 @@ rust_library {
     min_sdk_version: "29",
 }
 
-// dependent_library ["feature_list"]
-//   cfg-if-1.0.0
-//   libc-0.2.97 "default,std"
-//   log-0.4.14 "std"
+rust_defaults {
+    name: "mio_test_defaults",
+    crate_name: "mio",
+    srcs: ["src/lib.rs"],
+    cargo_env_compat: true,
+    cargo_pkg_version: "0.7.13",
+    test_suites: ["general-tests"],
+    auto_gen_config: true,
+    edition: "2018",
+    features: [
+        "net",
+        "os-ext",
+        "os-poll",
+        "os-util",
+        "tcp",
+        "udp",
+        "uds",
+    ],
+    rustlibs: [
+        "libenv_logger",
+        "liblibc",
+        "liblog_rust",
+        "librand",
+    ],
+}
+
+rust_test_host {
+    name: "mio_host_test_src_lib",
+    defaults: ["mio_test_defaults"],
+    test_options: {
+        unit_test: true,
+    },
+}
+
+rust_test {
+    name: "mio_device_test_src_lib",
+    defaults: ["mio_test_defaults"],
+}
