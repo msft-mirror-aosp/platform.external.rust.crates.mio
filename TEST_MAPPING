@@ -14,6 +14,17 @@
       "path": "external/rust/crates/tokio-test"
     }
   ],
+  "postsubmit": [
+    {
+      "name": "doh_unit_test"
+    },
+    {
+      "name": "mio_test_src_lib"
+    },
+    {
+      "name": "rustBinderTest"
+    }
+  ],
   "presubmit": [
     {
       "name": "doh_unit_test"
